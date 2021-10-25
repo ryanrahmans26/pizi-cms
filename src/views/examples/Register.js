@@ -32,6 +32,7 @@ import {
 
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom';
+import SweetAlert from "react-bootstrap-sweetalert";
 
 const Register = () => {
   const history = useHistory();
@@ -39,13 +40,17 @@ const Register = () => {
   const[username, setUsername] = useState('')
   const[password, setPassword] = useState('')
 
+  const [isOpen, setOpen] = useState(false);
+  const [alertStatus, setAlertStatus] = useState();
+  const [apiMessage, setApiMessage] = useState();
+
   const addUser = async (user) => {
 
     if (!user) {
       return
     }
 
-    const res = await fetch('http://localhost:8080/user',
+    const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user`,
     {
       method: 'POST',
       headers: {
@@ -58,9 +63,11 @@ const Register = () => {
 
     if (data.code === "200") {
       history.push("/admin/index")
+    } else {
+      setAlertStatus({"warning": true})
+      setApiMessage(data.message)
+      setOpen(true)
     }
-
-    alert(data.message)
 
     console.log(data)
   }
@@ -73,6 +80,16 @@ const Register = () => {
 
   return (
     <>
+    <SweetAlert      
+          {...alertStatus}
+          show={isOpen} //Notice how we bind the show property to our component state
+          title="Info"
+          onConfirm={() => setOpen(false)}
+          timeout={2000}
+          showConfirmButton={false}
+      >
+          {apiMessage}
+      </SweetAlert>
       <Col lg="6" md="8">
         <Card className="bg-secondary shadow border-0">
           <CardBody className="px-lg-5 py-lg-5">

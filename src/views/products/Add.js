@@ -32,38 +32,61 @@ import {
   // core components
   import UserHeader from "components/Headers/UserHeader.js";
   import { useParams, useState } from 'react'
-import { useHistory } from "react-router-dom";
+import { formatDiagnosticsWithColorAndContext } from "typescript";
 import SweetAlert from "react-bootstrap-sweetalert";
+import { useHistory } from "react-router-dom";
+
   
-  const UserAdd = () => {
+  const ProductAdd = () => {
     const history = useHistory()
     // const { id } = useParams();
-    const [username, setUsername] = useState('')
-    const [password, setPassword] = useState('')
+    const storedJwt = localStorage.getItem('token');
+    const [jwt] = useState(storedJwt || null);
+    const [title, setTitle] = useState('')
+    const [description, setDescription] = useState('')
+    const [selectedFile, setSelectedFile] = useState();
+	const [isFilePicked, setIsSelected] = useState(false);
+
     const [isOpen, setOpen] = useState(false);
     const [alertStatus, setAlertStatus] = useState();
     const [apiMessage, setApiMessage] = useState();
 
-    const addUser = async (user) => {
+    const changeHandler = (event) => {
+		setSelectedFile(event.target.files[0]);
+		setIsSelected(true);
+	};
 
-      if (!user) {
-        return
-      }
+    const addProduct = async (product) => {
 
-      const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user`,
+        if (!product) {
+            return
+          }
+
+        const formData = new FormData();
+        formData.append("title", product.title)
+        formData.append("description", product.description)
+        formData.append('file', selectedFile);
+
+      const res = await fetch(`${process.env.REACT_APP_BASE_URL}/product`,
       {
+
         method: 'POST',
         headers: {
-          'Content-type': 'application/json'
+            'Authorization': jwt
         },
-        body: JSON.stringify(user)
+        body: formData
       })
   
       const data = await res.json()
 
       if (data.code === "200") {
-        setUsername('')
-        setPassword('')
+        setTitle('')
+        setDescription('')
+        setIsSelected(false)
+
+        setAlertStatus({"success": true})
+        setApiMessage(data.message)
+        setOpen(true)
       } else if (data.code === "500") {
         setAlertStatus({"warning": true})
         setApiMessage(data.message)
@@ -74,13 +97,14 @@ import SweetAlert from "react-bootstrap-sweetalert";
         setApiMessage(data.message)
         setOpen(true)
       }
-
+      
       console.log(data)
     }
-  
+
+
     return (
       <>
-      <SweetAlert      
+        <SweetAlert      
             {...alertStatus}
             show={isOpen} //Notice how we bind the show property to our component state
             title="Info"
@@ -100,7 +124,7 @@ import SweetAlert from "react-bootstrap-sweetalert";
                 <CardHeader className="bg-white border-0">
                   <Row className="align-items-center">
                     <Col xs="8">
-                      <h3 className="mb-0">Add user</h3>
+                      <h3 className="mb-0">Add product</h3>
                     </Col>
                     <Col className="text-right" xs="4">
                       <Button
@@ -108,7 +132,7 @@ import SweetAlert from "react-bootstrap-sweetalert";
                         href="#pablo"
                         onClick={(e) => {
                           e.preventDefault()
-                          addUser({username, password})
+                          addProduct({title, description})
                         }}
                         size="md"
                       >
@@ -120,7 +144,7 @@ import SweetAlert from "react-bootstrap-sweetalert";
                 <CardBody>
                   <Form>
                     <h6 className="heading-small text-muted mb-4">
-                      User information
+                      Product information
                     </h6>
                     <div className="pl-lg-4">
                       <Row>
@@ -128,18 +152,18 @@ import SweetAlert from "react-bootstrap-sweetalert";
                           <FormGroup>
                             <label
                               className="form-control-label"
-                              htmlFor="input-username"
+                              htmlFor="input-title"
                             >
-                              Username
+                              Title
                             </label>
                             <Input
                               className="form-control-alternative"
                               defaultValue="lucky.jesse"
-                              id="input-username"
-                              placeholder="Username"
+                              id="input-title"
+                              placeholder="Title"
                               type="text"
-                              value={username}
-                              onChange={(e) => setUsername(e.target.value)}
+                              value={title}
+                              onChange={(e) => setTitle(e.target.value)}
                             />
                           </FormGroup>
                         </Col>
@@ -149,18 +173,36 @@ import SweetAlert from "react-bootstrap-sweetalert";
                           <FormGroup>
                             <label
                               className="form-control-label"
-                              htmlFor="input-first-name"
+                              htmlFor="input-description"
                             >
-                              Password
+                              Description
                             </label>
                             <Input
                               className="form-control-alternative"
-                              defaultValue="Lucky"
-                              id="input-first-name"
-                              placeholder="Password"
+                              defaultValue="Description"
+                              id="input-description"
+                              placeholder="Description"
                               type="text"
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
+                              value={description}
+                              onChange={(e) => setDescription(e.target.value)}
+                            />
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col lg="6">
+                          <FormGroup>
+                            <label
+                              className="form-control-label"
+                              htmlFor="input-description"
+                            >
+                                Photo
+                            </label>
+                            <Input
+                              className="form-control-alternative"
+                              id="input-file"
+                              type="file"
+                              onChange={changeHandler}
                             />
                           </FormGroup>
                         </Col>
@@ -176,5 +218,5 @@ import SweetAlert from "react-bootstrap-sweetalert";
     );
   };
   
-  export default UserAdd;
+  export default ProductAdd;
   

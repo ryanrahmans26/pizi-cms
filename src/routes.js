@@ -18,9 +18,14 @@
 import Index from "views/Index.js";
 import Register from "views/examples/Register.js";
 import Login from "views/examples/Login.js";
+
 import UserIndex from "views/users/Index.js";
 import UserAdd from "views/users/Add.js";
 import UserEdit from "views/users/Edit.js";
+
+import ProductIndex from "views/products/Index.js";
+import ProductAdd from "views/products/Add.js";
+import ProductEdit from "views/products/Edit.js";
 
 var routes = [
   {
@@ -64,7 +69,28 @@ var routes = [
     icon: "ni ni-circle-08 text-pink",
     component: UserEdit,
     layout: "/admin",
-  }
+  },
+  {
+    path: "/products",
+    name: "Products",
+    icon: "ni ni-bullet-list-67 text-red",
+    component: ProductIndex,
+    layout: "/admin",
+  },
+  {
+    path: "/product/add",
+    name: "Product Add",
+    icon: "ni ni-circle-08 text-pink",
+    component: ProductAdd,
+    layout: "/admin",
+  },
+  {
+    path: "/product/edit/:id",
+    name: "Product Edit",
+    icon: "ni ni-circle-08 text-pink",
+    component: ProductEdit,
+    layout: "/admin",
+  },
 ];
 
 export default routes;

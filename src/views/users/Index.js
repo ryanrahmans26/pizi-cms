@@ -35,8 +35,11 @@ import {
 
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from 'react'
+import { useHistory } from "react-router-dom";
+import SweetAlert from "react-bootstrap-sweetalert";
 
 const UserIndex = () => {
+  const history = useHistory()
   const storedJwt = localStorage.getItem('token');
   const [jwt] = useState(storedJwt || null);
 
@@ -44,8 +47,14 @@ const UserIndex = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
 
+  const [userId, setUserId] = useState();
+  const [isOpen, setOpen] = useState(false);
+  const [alertStatus, setAlertStatus] = useState();
+  const [apiMessage, setApiMessage] = useState();
+  const [isOpen2, setOpen2] = useState(false);
+
   const getUsers = async (token) => {
-    const res = await fetch('http://localhost:8080/user',
+    const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user`,
     {
         method: 'GET',
         headers: {
@@ -64,6 +73,15 @@ const UserIndex = () => {
         setError(false)
         console.log(users)
         return
+    } else if (data.code === "500") {
+      setAlertStatus({"warning": true})
+      setApiMessage(data.message)
+      setOpen(true)
+      history.push("/auth/login")
+    } else {
+      setAlertStatus({"warning": true})
+      setApiMessage(data.message)
+      setOpen(true)
     }
 
     setError(data.error)
@@ -75,8 +93,8 @@ const UserIndex = () => {
       setLoading(false)
   }, [])// eslint-disable-line react-hooks/exhaustive-deps
 
-  const deleteUser = async (id) => {
-    const res = await fetch(`http://localhost:8080/user/${id}`,
+  const deleteUser = async () => {
+    const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/${userId}`,
     {
         method: 'DELETE',
         headers: {
@@ -95,6 +113,15 @@ const UserIndex = () => {
         setError(false)
         
         return
+    } else if (data.code === "500") {
+      setAlertStatus({"warning": true})
+      setApiMessage(data.message)
+      setOpen(true)
+      history.push("/auth/login")
+    } else {
+      setAlertStatus({"warning": true})
+      setApiMessage(data.message)
+      setOpen(true)
     }
 
     setError(data.error)
@@ -102,6 +129,33 @@ const UserIndex = () => {
 
   return (
     <>
+    <SweetAlert      
+            {...alertStatus}
+            show={isOpen2} //Notice how we bind the show property to our component state
+            title="Info"
+            onConfirm={() => setOpen(false)}
+            timeout={2000}
+            showConfirmButton={false}
+        >
+            {apiMessage}
+        </SweetAlert>
+
+        <SweetAlert
+        warning
+        showCancel
+        show={isOpen} //Notice how we bind the show property to our component state
+        confirmBtnText="Yes, delete it!"
+        confirmBtnBsStyle="danger"
+        title="Are you sure?"
+        onConfirm={() => deleteUser()}
+        onCancel={() => {
+            console.log("bye");
+            setOpen(false); // Don't forget to close the modal
+        }}
+        focusCancelBtn
+        >
+        You will not be able to recover this action
+        </SweetAlert>
       <div className="header bg-gradient-info pb-6 pt-5 pt-md-8">
       </div>
       {/* Page content */}
@@ -113,7 +167,7 @@ const UserIndex = () => {
               <CardHeader className="bg-transparent border-0">
               <Row className="align-items-center">
                   <Col xs="8">
-                    <h3 className="text-white mb-0">Users</h3>
+                    <h3 className="text-white mb-0">USERS</h3>
                   </Col>
                   <Col className="text-right" xs="4">
                     <Button
@@ -135,7 +189,7 @@ const UserIndex = () => {
                   <tr>
                     <th scope="col">Username</th>
                     <th scope="col">Password</th>
-                    <th scope="col" />
+                    <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -149,7 +203,7 @@ const UserIndex = () => {
                       <tr key={user.id}>
                         <td>{user.username}</td>
                         <td>{user.password}</td>
-                        <UncontrolledDropdown>
+                        <td><UncontrolledDropdown>
                         <DropdownToggle
                           className="btn-icon-only text-light"
                           href="#pablo"
@@ -170,13 +224,15 @@ const UserIndex = () => {
                           <DropdownItem
                             onClick={(e) => {
                               e.preventDefault()
-                              deleteUser(user.id)
+                              // deleteUser(user.id)
+                              setUserId(user.id)
+                                setOpen(true); // Open the modal
                             }}
                           >
                             Delete
                           </DropdownItem>
                         </DropdownMenu>
-                      </UncontrolledDropdown>
+                      </UncontrolledDropdown></td>
                       </tr>
                     ))
                 )}

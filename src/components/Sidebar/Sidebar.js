@@ -23,9 +23,12 @@ import { PropTypes } from "prop-types";
 import Index from "views/Index.js";
 import Register from "views/examples/Register.js";
 import Login from "views/examples/Login.js";
+
 import UserIndex from "views/users/Index.js";
 import UserEdit from "views/users/Edit.js";
 import UserAdd from "views/users/Add.js";
+
+import ProductIndex from "views/products/Index.js";
 
 // reactstrap components
 import {
@@ -254,8 +257,15 @@ Sidebar.defaultProps = {
     {
       path: "/users",
       name: "Users",
-      icon: "ni ni-bullet-list-67 text-red",
+      icon: "ni ni-single-02 text-red",
       component: UserIndex,
+      layout: "/admin",
+    },
+    {
+      path: "/products",
+      name: "Products",
+      icon: "ni ni-cart text-red",
+      component: ProductIndex,
       layout: "/admin",
     }
   ]

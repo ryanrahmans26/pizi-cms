@@ -32,9 +32,11 @@ import {
 // core components
 import UserHeader from "components/Headers/UserHeader.js";
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
+import SweetAlert from "react-bootstrap-sweetalert";
 
 const UserEdit = () => {
+  const history = useHistory()
   const { id } = useParams();
   const storedJwt = localStorage.getItem('token');
   const [jwt] = useState(storedJwt || null);
@@ -44,8 +46,12 @@ const UserEdit = () => {
 
   const [loading, setLoading] = useState(false)
 
+  const [isOpen, setOpen] = useState(false);
+  const [alertStatus, setAlertStatus] = useState();
+  const [apiMessage, setApiMessage] = useState();
+
   const getUser = async (id) => {
-    const res = await fetch(`http://localhost:8080/user/${id}`,
+    const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/${id}`,
     {
         method: 'GET',
         headers: {
@@ -64,8 +70,16 @@ const UserEdit = () => {
         setPassword(data.data.password)
         console.log("username = ", username)
         return
+    } else if (data.code === "500") {
+      setAlertStatus({"warning": true})
+      setApiMessage(data.message)
+      setOpen(true)
+      history.push("/auth/login")
     } else {
-      alert(data.message)
+      setAlertStatus({"warning": true})
+        setApiMessage(data.message)
+        setOpen(true)
+        
     }
   }
 
@@ -77,7 +91,7 @@ const UserEdit = () => {
 
   const editUser = async (id, user) => {
 
-    const res = await fetch(`http://localhost:8080/user/${id}`,
+    const res = await fetch(`${process.env.REACT_APP_BASE_URL}/user/${id}`,
     {
       method: 'PUT',
       headers: {
@@ -91,15 +105,32 @@ const UserEdit = () => {
 
     if (data.code === "200") {
       getUser(id)
+    } else if (data.code === "500") {
+      setAlertStatus({"warning": true})
+      setApiMessage(data.message)
+      setOpen(true)
+      history.push("/auth/login")
+    } else {
+      setAlertStatus({"warning": true})
+      setApiMessage(data.message)
+      setOpen(true)
     }
-
-    alert(data.message)
 
     console.log(data)
   }
 
   return (
     <>
+     <SweetAlert      
+            {...alertStatus}
+            show={isOpen} //Notice how we bind the show property to our component state
+            title="Info"
+            onConfirm={() => setOpen(false)}
+            timeout={2000}
+            showConfirmButton={false}
+        >
+            {apiMessage}
+        </SweetAlert>
     <div className="header bg-gradient-info pb-6 pt-5 pt-md-8">
     </div>
       {/* Page content */}
