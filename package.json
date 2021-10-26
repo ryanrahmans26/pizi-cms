@@ -22,7 +22,7 @@
   "bugs": {
     "url": "https://github.com/creativetimofficial/argon-dashboard-react/issues"
   },
-  "homepage": ".",
+  "homepage": "http://3.1.213.179",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
