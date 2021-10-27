@@ -73,9 +73,7 @@ const AdminNavbar = (props) => {
                   <span className="avatar avatar-sm rounded-circle">
                     <img
                       alt="..."
-                      src={
-                        TeamAvatar
-                      }
+                      src="https://pizi-cms.ryanrahmans.com/static/media/team-4-800x800.99c612eb.jpg"
                     />
                   </span>
                   <Media className="ml-2 d-none d-lg-block">
