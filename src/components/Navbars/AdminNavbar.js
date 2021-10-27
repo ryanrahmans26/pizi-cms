@@ -35,6 +35,7 @@ import {
 } from "reactstrap";
 
 import { useState } from 'react'
+import TeamAvatar from '../../assets/img/theme/team-4-800x800.jpg'
 
 const AdminNavbar = (props) => {
   const storedUsername = localStorage.getItem('username');
@@ -73,8 +74,7 @@ const AdminNavbar = (props) => {
                     <img
                       alt="..."
                       src={
-                        require("../../assets/img/theme/team-4-800x800.jpg")
-                          .default
+                        TeamAvatar
                       }
                     />
                   </span>
